@@ -1,7 +1,7 @@
 const axios = require('axios');
 const fs = require('fs');
 
-const apiUrl = 'https://origins.habbo.es/api/public/matches/v1/gp-hhoes-c7e8fee0d326d9f2cae28073b6b88fba/ids';
+const apiUrl = 'https://origins.habbo.es/api/public/matches/v1/gp-hhoes-c249e750401e525d80ca74c390b6a343/ids';
 const limit = 100; // Límite máximo por la API
 let offset = 0;
 let allResults = [];
@@ -37,7 +37,7 @@ async function fetchMatches() {
 }
 
 function saveResultsToFile() {
-    fs.writeFile('matches.json', JSON.stringify(allResults, null, 2), (err) => {
+    fs.writeFile('games.json', JSON.stringify(allResults, null, 2), (err) => {
         if (err) {
             console.error('Error writing to file:', err);
         } else {
