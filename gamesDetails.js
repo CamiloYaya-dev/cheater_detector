@@ -6,10 +6,28 @@ let playerCounts = {};
 let totalGameScore = 0;
 let winCount = 0;
 let totalRankedMatches = 0;
-const targetPlayerId = 'gp-hhoes-c249e750401e525d80ca74c390b6a343';
+const targetPlayerId = 'gp-hhoes-931112b96c7a9bd3afa5c1f5ed0276a5';
 
 async function fetchMatchDetails() {
-    const matches = JSON.parse(fs.readFileSync('games.json'));
+    let matches;
+
+    try {
+        const fileContent = fs.readFileSync('games.json', 'utf-8');
+        
+        if (!fileContent || fileContent.trim() === '') {
+            throw new Error('games.json is empty or unreadable');
+        }
+
+        matches = JSON.parse(fileContent);
+        
+        if (!Array.isArray(matches)) {
+            throw new Error('games.json does not contain a valid JSON array');
+        }
+
+    } catch (error) {
+        console.error('Error reading or parsing games.json:', error.message);
+        return;  // Abort further execution if the file cannot be read or parsed
+    }
 
     for (const matchId of matches) {
         try {
@@ -50,34 +68,42 @@ async function fetchMatchDetails() {
         }
     }
 
-    savePlayerCountsToFile();
-    saveTotalGameScoreAndWinRateToFile();
+    await savePlayerCountsToFile();
+    await saveTotalGameScoreAndWinRateToFile();
 }
 
-function savePlayerCountsToFile() {
-    fs.writeFile('player_counts.json', JSON.stringify(playerCounts, null, 2), (err) => {
-        if (err) {
-            console.error('Error writing to file:', err);
-        } else {
-            console.log('Data successfully saved to player_counts.json');
-        }
+async function savePlayerCountsToFile() {
+    return new Promise((resolve, reject) => {
+        fs.writeFile('player_counts.json', JSON.stringify(playerCounts, null, 2), (err) => {
+            if (err) {
+                console.error('Error writing to file:', err);
+                reject(err);
+            } else {
+                console.log('Data successfully saved to player_counts.json');
+                resolve();
+            }
+        });
     });
 }
 
-function saveTotalGameScoreAndWinRateToFile() {
+async function saveTotalGameScoreAndWinRateToFile() {
     const winRate = (winCount / totalRankedMatches) * 100;
     const result = {
         totalGameScore,
         winRate: `${winRate.toFixed(2)}%`
     };
 
-    fs.writeFile('total_game_score_and_win_rate.json', JSON.stringify(result, null, 2), (err) => {
-        if (err) {
-            console.error('Error writing to file:', err);
-        } else {
-            console.log('Total game score and win rate successfully saved to total_game_score_and_win_rate.json');
-        }
+    return new Promise((resolve, reject) => {
+        fs.writeFile('total_game_score_and_win_rate.json', JSON.stringify(result, null, 2), (err) => {
+            if (err) {
+                console.error('Error writing to file:', err);
+                reject(err);
+            } else {
+                console.log('Total game score and win rate successfully saved to total_game_score_and_win_rate.json');
+                resolve();
+            }
+        });
     });
 }
 
-fetchMatchDetails();
+module.exports = fetchMatchDetails;
