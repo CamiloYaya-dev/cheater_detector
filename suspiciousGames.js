@@ -1,5 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
+require('dotenv').config(); // Cargar variables de entorno desde .env
 
 const apiUrlMatchDetails = 'https://origins.habbo.es/api/public/matches/v1';
 let playerCounts = {};
@@ -40,6 +41,8 @@ async function analyzeMatches() {
             const matchInfo = response.data.info;
             const participants = response.data.metadata.participantPlayerIds;
 
+            console.log(`Processing match: ${matchId}, Participants: ${participants.join(', ')}`);
+
             // Si la partida es ranked y tiene menos de 4 jugadores (1 vs 1 o 2 vs 2)
             if (matchInfo.ranked && participants.length <= 4) {
                 let allPlayersSuspicious = true; // Global flag for the match
@@ -54,37 +57,38 @@ async function analyzeMatches() {
 
                 for (const player of matchInfo.participants) {
                     let isSuspiciousPlayer = false;
-
-                    // Mark the player as suspicious if they are not the target player and have participated in 50+ matches
-                    if (playerCounts[player.gamePlayerId] && playerCounts[player.gamePlayerId] >= 50) {
-                        isSuspiciousPlayer = true;
-
-                        // Add player to repeat offender list if not already present
-                        let existingPlayer = repeatOffenderPlayers.find(p => p.gamePlayerId === player.gamePlayerId);
-                        if (!existingPlayer) {
-                            repeatOffenderPlayers.push({
-                                gamePlayerId: player.gamePlayerId,
-                                appearances: playerCounts[player.gamePlayerId],
-                                gamesWith: 0, // Initialize count of games played with the target player
-                                gamesAgainst: 0, // Initialize count of games played against the target player
-                                gamesWon: 0, // Initialize games won
-                                gamesLost: 0  // Initialize games lost
-                            });
-                            existingPlayer = repeatOffenderPlayers[repeatOffenderPlayers.length - 1];
-                        }
-
-                        // Increment gamesWith or gamesAgainst based on team association
-                        if (player.teamId === targetPlayerTeam) {
-                            existingPlayer.gamesWith++;
-                        } else {
-                            existingPlayer.gamesAgainst++;
-                        }
-                    }
-
+                    console.log('camilo1'+player.gamePlayerId)
+                    console.log('camilo2'+targetPlayerId)
                     if (player.gamePlayerId === targetPlayerId) {
+                        isSuspiciousPlayer = true; // Marcar al jugador objetivo como sospechoso
                         targetPlayerScore = player.gameScore;
+                        console.log(`Target player ${targetPlayerId} found with score ${targetPlayerScore}`);
                     } else {
                         enemyTeamScores.push(player.gameScore);
+
+                        // Marcar a los otros jugadores como sospechosos si han jugado más de 50 partidas
+                        if (playerCounts[player.gamePlayerId] && playerCounts[player.gamePlayerId] >= 50) {
+                            isSuspiciousPlayer = true;
+
+                            let existingPlayer = repeatOffenderPlayers.find(p => p.gamePlayerId === player.gamePlayerId);
+                            if (!existingPlayer) {
+                                repeatOffenderPlayers.push({
+                                    gamePlayerId: player.gamePlayerId,
+                                    appearances: playerCounts[player.gamePlayerId],
+                                    gamesWith: 0, // Initialize count of games played with the target player
+                                    gamesAgainst: 0, // Initialize count of games played against the target player
+                                    gamesWon: 0, // Initialize games won
+                                    gamesLost: 0  // Initialize games lost
+                                });
+                                existingPlayer = repeatOffenderPlayers[repeatOffenderPlayers.length - 1];
+                            }
+
+                            if (player.teamId === targetPlayerTeam) {
+                                existingPlayer.gamesWith++;
+                            } else {
+                                existingPlayer.gamesAgainst++;
+                            }
+                        }
                     }
 
                     const playerData = {
@@ -102,32 +106,35 @@ async function analyzeMatches() {
                         tilesLocked: player.tilesLocked,
                         tilesColouredForOpponents: player.tilesColouredForOpponents,
                         tilesStolenLow: player.tilesStolen < 5, // Flag for individual player
-                        isSuspiciousPlayer // Flag indicating if the player is suspicious based on repetitions
+                        isSuspiciousPlayer: isSuspiciousPlayer // Garantizar que el jugador objetivo siempre sea sospechoso
                     };
+
+                    console.log(`Player ${player.gamePlayerId} suspicious: ${playerData.isSuspiciousPlayer}`);
+
                     suspiciousPlayerData.push(playerData);
                     scores.push(player.gameScore);
 
-                    // Check if this player's tilesStolen is low
+                    // Verificar si este jugador ha robado pocas fichas
                     if (player.tilesStolen >= 5) {
                         allTilesStolenLowGlobal = false;
                     }
 
-                    // If any non-target player is not suspicious, set allPlayersSuspicious to false
-                    if (!isSuspiciousPlayer && player.gamePlayerId !== targetPlayerId) {
+                    // Si algún jugador no es sospechoso y no es el jugador objetivo, se desactiva la bandera global
+                    if (!isSuspiciousPlayer) {
                         allPlayersSuspicious = false;
                     }
                 }
 
-                // Sort scores to easily compare adjacent values
+                // Ordenar puntuaciones para comparar valores adyacentes
                 scores.sort((a, b) => a - b);
 
-                // Check for nearly equal scores
+                // Verificar puntuaciones casi iguales
                 let hasSuspiciousEqualScores = scores.every((score, index, arr) => {
                     if (index === 0) return true;
-                    return Math.abs(score - arr[index - 1]) <= 5; // Adjust threshold as needed
+                    return Math.abs(score - arr[index - 1]) <= 5; // Ajustar el umbral según sea necesario
                 });
 
-                // Check for large differences in scores where the target player benefits
+                // Verificar grandes diferencias en puntuaciones donde el jugador objetivo se beneficia
                 let hasSuspiciousLargeDifferences = false;
                 if (enemyTeamScores.length > 0) {
                     hasSuspiciousLargeDifferences = enemyTeamScores.every(score => Math.abs(targetPlayerScore - score) > 50);
@@ -150,6 +157,8 @@ async function analyzeMatches() {
                     });
                     console.log(`Suspicious match found: ${matchId}`);
                 }
+            } else {
+                console.log(`Match ${matchId} is not ranked or has more than 4 players.`);
             }
         } catch (error) {
             console.error(`Error fetching match details for match ID ${matchId}:`, error);
