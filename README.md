@@ -112,6 +112,12 @@
 
     The information in this flag can be verified with the player_counts.json, repeat_offender_players.json, and suspicious_matches.json files.
 
+    Suppose there are 20 people in a lobby, and a game is created in which 4 players are randomly selected to participate. The chance of the exact same combination of players (regardless of order) being repeated in another game is extremely low. Specifically, the probability of this same combination of 4 people being repeated is 1 in 4845, or approximately 0.02064%.
+
+    If you play 1000 games, in the same 20-person lobby, the expected number of times a specific combination of 4 players will be repeated is also very low, around 0.21 times. This means that on average you might not see any repetition, but if you do, it would be a fairly rare situation.
+
+    That's why this flag is so important, because it detects irregularity in the same combination of players (collusion).
+
 ## GRATITUDE
 
     Finally, I would like to thank anyone who has seen my code, it is free to use, you can do with it whatever you like, I know that the code may have many improvements, errors, etc... however, it is what I was able to do in a couple of hours, I hope that if someone finds it useful, they can improve it in terms of loading times and perhaps detect more irregularities, everything I do and do not do, has always been and will be to help the beautiful Habbo community, thank you for reading and using my code.
@@ -230,6 +236,12 @@
 
     La información de esta bandera se puede verificar con los archivos player_counts.json, repeat_offender_players.json y concerned_matches.json.
 
+    Supongamos que en una sala (lobby) hay 20 personas, y se crea una partida en la que 4 jugadores son seleccionados al azar para participar. La posibilidad de que se repita exactamente la misma combinación de jugadores (sin considerar el orden) en otra partida es extremadamente baja. Específicamente, la probabilidad de que esta misma combinación de 4 personas se repita es de 1 entre 4845, o aproximadamente 0.02064%.
+
+    Si juegas 1000 partidas, en la misma loby de 20 personas, la cantidad esperada de veces que se repetirá una combinación específica de 4 jugadores es también muy baja, alrededor de 0.21 veces. Esto significa que, en promedio, es posible que no veas ninguna repetición, pero si ocurre, sería una situación bastante rara.
+
+    Por eso es tan importante esta bandera, por que detecta la iregularidad en la misma convinacion de jugadores (collusion)
+    
 ## Agradecimiento 
 
     Por ultimo de gustaria agradecer a cualquier que halla visto mi codigo, es de uso libre, pueden hacer con el lo que gusten, se que talvez el codigo puede tener muchas mejoras, fallas, etc... sin embargo es lo que pude hacer en un par de horas, espero que si alguien lo ve util lo pueda perfeccionar en los tiempos de carga y talvez detectando mas irregularidades, todo lo que hago y dejo de hacer, siempre a sido y sera por ayudar a la hermosa comunidad de habbo, gracias por leer y utilizar mi codigo.
