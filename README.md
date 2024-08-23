@@ -118,6 +118,8 @@
 
     Sincerely, Emo. - Origins EN
 
+## Español documentacion
+
 ## Instalación y uso
 
 1. **Instalar dependencias:**
