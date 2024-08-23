@@ -116,7 +116,7 @@
 
     Finally, I would like to thank anyone who has seen my code, it is free to use, you can do with it whatever you like, I know that the code may have many improvements, errors, etc... however, it is what I was able to do in a couple of hours, I hope that if someone finds it useful, they can improve it in terms of loading times and perhaps detect more irregularities, everything I do and do not do, has always been and will be to help the beautiful Habbo community, thank you for reading and using my code.
 
-    Sincerely, Emo. - Origins EN
+    Sincerely, Emo. - Origins ES
 
 ## Español documentacion
 
