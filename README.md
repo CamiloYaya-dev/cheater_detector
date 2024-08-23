@@ -94,7 +94,7 @@
     Explanation of Win Boosting:
     Win boosting is a tactic where players intentionally underperform or lose in a game to help another player win or achieve a higher score. In the context of this script, it means that other players might be deliberately making poor moves, not contesting objectives, or otherwise not trying to win the match, all to ensure that the target player benefits, typically by increasing their score or improving their win rate. This practice is often frowned upon because it undermines the competitive integrity of the game.
 
-3.  **hasSuspiciousLargeDifferences - win boosting/aggre on games**
+3.  **hasSuspiciousLargeDifferences - win boosting/agree on games**
 
     allTilesStolenLowGlobal This flag basically serves as a bridge (if you want it) to help detect suspicious behavior from all players in the game, basically it detects if there were few tiles stolen by ALL players in the game. The threshold is less than 10 tiles stolen by each player.
 
@@ -212,7 +212,7 @@
     Explicación de Win Boosting:
     Win Boosting es una táctica en la que los jugadores tienen un rendimiento inferior o pierden intencionalmente en un juego para ayudar a otro jugador a ganar o lograr una puntuación más alta. En el contexto de este script, significa que otros jugadores podrían estar haciendo movimientos malos deliberadamente, no disputando objetivos o no tratando de ganar la partida, todo para garantizar que el jugador objetivo se beneficie, generalmente aumentando su puntuación o mejorando su tasa de victorias. Esta práctica a menudo está mal vista porque socava la integridad competitiva del juego.
 
-3. **hasSuspiciousLargeDifferences - aumento de victorias/agresión en partidas**
+3. **hasSuspiciousLargeDifferences - aumento de victorias/acuerdo sobre juegos**
 
     allTilesStolenLowGlobal Esta bandera básicamente sirve como un puente (si lo deseas) para ayudar a detectar comportamiento sospechoso de todos los jugadores en el juego, básicamente detecta si hubo pocas fichas robadas por TODOS los jugadores en el juego. El umbral es menos de 10 fichas robadas por cada jugador.
 
