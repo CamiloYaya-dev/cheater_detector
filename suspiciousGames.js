@@ -33,15 +33,12 @@ async function analyzeMatches() {
     if (!(await loadFiles())) return;
 
     let suspiciousMatches = [];
-    let repeatOffenderPlayers = [];
 
     for (const matchId of matches) {
         try {
             const response = await axios.get(`${apiUrlMatchDetails}/${matchId}`);
             const matchInfo = response.data.info;
             const participants = response.data.metadata.participantPlayerIds;
-
-            console.log(`Processing match: ${matchId}, Participants: ${participants.join(', ')}`);
 
             // Si la partida es ranked y tiene menos de 4 jugadores (1 vs 1 o 2 vs 2)
             if (matchInfo.ranked && participants.length <= 4) {
@@ -52,42 +49,17 @@ async function analyzeMatches() {
                 let targetPlayerScore = 0;
                 let enemyTeamScores = [];
 
-                // Determine the team of the target player
-                const targetPlayerTeam = matchInfo.participants.find(p => p.gamePlayerId === targetPlayerId)?.teamId;
-
                 for (const player of matchInfo.participants) {
                     let isSuspiciousPlayer = false;
-                    console.log('camilo1'+player.gamePlayerId)
-                    console.log('camilo2'+targetPlayerId)
                     if (player.gamePlayerId === targetPlayerId) {
                         isSuspiciousPlayer = true; // Marcar al jugador objetivo como sospechoso
                         targetPlayerScore = player.gameScore;
-                        console.log(`Target player ${targetPlayerId} found with score ${targetPlayerScore}`);
                     } else {
                         enemyTeamScores.push(player.gameScore);
 
                         // Marcar a los otros jugadores como sospechosos si han jugado más de 50 partidas
                         if (playerCounts[player.gamePlayerId] && playerCounts[player.gamePlayerId] >= 50) {
                             isSuspiciousPlayer = true;
-
-                            let existingPlayer = repeatOffenderPlayers.find(p => p.gamePlayerId === player.gamePlayerId);
-                            if (!existingPlayer) {
-                                repeatOffenderPlayers.push({
-                                    gamePlayerId: player.gamePlayerId,
-                                    appearances: playerCounts[player.gamePlayerId],
-                                    gamesWith: 0, // Initialize count of games played with the target player
-                                    gamesAgainst: 0, // Initialize count of games played against the target player
-                                    gamesWon: 0, // Initialize games won
-                                    gamesLost: 0  // Initialize games lost
-                                });
-                                existingPlayer = repeatOffenderPlayers[repeatOffenderPlayers.length - 1];
-                            }
-
-                            if (player.teamId === targetPlayerTeam) {
-                                existingPlayer.gamesWith++;
-                            } else {
-                                existingPlayer.gamesAgainst++;
-                            }
                         }
                     }
 
@@ -105,11 +77,9 @@ async function analyzeMatches() {
                         tilesStolen: player.tilesStolen,
                         tilesLocked: player.tilesLocked,
                         tilesColouredForOpponents: player.tilesColouredForOpponents,
-                        tilesStolenLow: player.tilesStolen < 5, // Flag for individual player
+                        tilesStolenLow: player.tilesStolen < 10, // Flag for individual player
                         isSuspiciousPlayer: isSuspiciousPlayer // Garantizar que el jugador objetivo siempre sea sospechoso
                     };
-
-                    console.log(`Player ${player.gamePlayerId} suspicious: ${playerData.isSuspiciousPlayer}`);
 
                     suspiciousPlayerData.push(playerData);
                     scores.push(player.gameScore);
@@ -166,8 +136,8 @@ async function analyzeMatches() {
     }
 
     saveSuspiciousMatchesToFile(suspiciousMatches);
-    saveRepeatOffenderPlayersToFile(repeatOffenderPlayers);
     await calculateAndSaveFlagCounts(suspiciousMatches);
+    await calculateAndSaveRepeatOffenderPlayers(suspiciousMatches);
 }
 
 function saveSuspiciousMatchesToFile(suspiciousMatches) {
@@ -180,8 +150,36 @@ function saveSuspiciousMatchesToFile(suspiciousMatches) {
     });
 }
 
-function saveRepeatOffenderPlayersToFile(repeatOffenderPlayers) {
-    fs.writeFile('repeat_offender_players.json', JSON.stringify(repeatOffenderPlayers, null, 2), (err) => {
+async function calculateAndSaveRepeatOffenderPlayers(suspiciousMatches) {
+    let repeatOffenderPlayers = {};
+
+    suspiciousMatches.forEach(match => {
+        match.players.forEach(player => {
+            if (player.isSuspiciousPlayer) {
+                if (!repeatOffenderPlayers[player.gamePlayerId]) {
+                    repeatOffenderPlayers[player.gamePlayerId] = {
+                        gamePlayerId: player.gamePlayerId,
+                        appearances: 0,
+                        gamesWith: 0,
+                        gamesAgainst: 0
+                    };
+                }
+
+                repeatOffenderPlayers[player.gamePlayerId].appearances++;
+
+                const targetPlayer = match.players.find(p => p.gamePlayerId === targetPlayerId);
+                if (player.teamId === targetPlayer.teamId) {
+                    repeatOffenderPlayers[player.gamePlayerId].gamesWith++;
+                } else {
+                    repeatOffenderPlayers[player.gamePlayerId].gamesAgainst++;
+                }
+            }
+        });
+    });
+
+    const repeatOffenderArray = Object.values(repeatOffenderPlayers);
+
+    fs.writeFile('repeat_offender_players.json', JSON.stringify(repeatOffenderArray, null, 2), (err) => {
         if (err) {
             console.error('Error writing to file:', err);
         } else {
