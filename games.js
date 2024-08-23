@@ -1,9 +1,9 @@
 const axios = require('axios');
 const fs = require('fs');
-require('dotenv').config(); // Cargar variables de entorno desde .env
+require('dotenv').config();
 
 const apiUrl = `https://origins.habbo.es/api/public/matches/v1/${process.env.TARGET_PLAYER_ID}/ids`;
-const limit = 100; // Límite máximo por la API
+const limit = 100;
 let offset = 0;
 let allResults = [];
 
@@ -30,11 +30,11 @@ async function fetchMatches() {
             }
         } catch (error) {
             console.error('Error fetching data:', error);
-            hasMoreData = false; // Stop if there's an error
+            hasMoreData = false;
         }
     }
 
-    await saveResultsToFile();  // Ensure the file is saved before returning
+    await saveResultsToFile();
 }
 
 async function saveResultsToFile() {

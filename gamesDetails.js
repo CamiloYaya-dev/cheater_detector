@@ -6,8 +6,8 @@ let playerCounts = {};
 let totalGameScore = 0;
 let winCount = 0;
 let totalRankedMatches = 0;
-let totalMatches = 0;  // Total de partidas
-let totalNonRankedMatches = 0;  // Partidas con ranked: false
+let totalMatches = 0;
+let totalNonRankedMatches = 0;
 const targetPlayerId = process.env.TARGET_PLAYER_ID;
 
 async function fetchMatchDetails() {
@@ -28,7 +28,7 @@ async function fetchMatchDetails() {
 
     } catch (error) {
         console.error('Error reading or parsing games.json:', error.message);
-        return;  // Abort further execution if the file cannot be read or parsed
+        return;
     }
 
     for (const matchId of matches) {
@@ -37,13 +37,11 @@ async function fetchMatchDetails() {
             const matchInfo = response.data.info;
             const participants = response.data.metadata.participantPlayerIds;
 
-            // Incrementar el total de partidas
             totalMatches++;
 
             if (matchInfo.ranked) {
                 totalRankedMatches++;
 
-                // Contar la aparición de cada participante, excluyendo al jugador objetivo
                 for (const playerId of participants) {
                     if (playerId !== targetPlayerId) {
                         if (playerCounts[playerId]) {
@@ -54,12 +52,10 @@ async function fetchMatchDetails() {
                     }
                 }
 
-                // Sumar el gameScore del jugador objetivo
                 const targetPlayer = matchInfo.participants.find(p => p.gamePlayerId === targetPlayerId);
                 if (targetPlayer) {
                     totalGameScore += targetPlayer.gameScore;
 
-                    // Verificar si el equipo del jugador objetivo ganó
                     const playerTeam = matchInfo.teams.find(t => t.teamId === targetPlayer.teamId);
                     if (playerTeam && playerTeam.win) {
                         winCount++;
@@ -67,7 +63,7 @@ async function fetchMatchDetails() {
                 }
 
             } else {
-                totalNonRankedMatches++;  // Incrementar el contador de partidas no rankeadas
+                totalNonRankedMatches++;
             }
 
             console.log(`Processed match: ${matchId}`);
@@ -100,9 +96,9 @@ async function saveTotalGameScoreAndWinRateToFile() {
     const result = {
         totalGameScore,
         winRate: `${winRate.toFixed(2)}%`,
-        totalMatches,  // Total de partidas jugadas
-        totalRankedMatches,  // Partidas con ranked: true
-        totalNonRankedMatches  // Partidas con ranked: false
+        totalMatches,
+        totalRankedMatches,
+        totalNonRankedMatches
     };
 
     return new Promise((resolve, reject) => {

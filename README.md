@@ -1,12 +1,13 @@
 # Irregularity Detector
 
+## English documentation
+
 ## Installation and Usage
 
 1. **Install Dependencies:**
 
    Run the following command in the console to install the necessary dependencies:
 
-   ```bash
    npm install
 
 2. **Set Up Environment Variables:**
@@ -15,7 +16,9 @@
 
     Example:
 
-    TARGET_PLAYER_ID=gp-hhoes-a0e19d7c2f6070aaa301d43afbef59a8
+    TARGET_PLAYER_ID=gp-hhoes-a9b08b16186ec8c9be235ada44f5e777
+
+    This id is from my Emo. user and I did some unethical practices to see if the cheat detector would work, I am not participating in the competition and I just made this program to try to make the competition more fair for everyone.
 
 3. **Run the Script:**
 
@@ -91,4 +94,142 @@
     Explanation of Win Boosting:
     Win boosting is a tactic where players intentionally underperform or lose in a game to help another player win or achieve a higher score. In the context of this script, it means that other players might be deliberately making poor moves, not contesting objectives, or otherwise not trying to win the match, all to ensure that the target player benefits, typically by increasing their score or improving their win rate. This practice is often frowned upon because it undermines the competitive integrity of the game.
 
-3.  **hasSuspiciousLargeDifferences - win boosting**
+3.  **hasSuspiciousLargeDifferences - win boosting/aggre on games**
+
+    allTilesStolenLowGlobal This flag basically serves as a bridge (if you want it) to help detect suspicious behavior from all players in the game, basically it detects if there were few tiles stolen by ALL players in the game. The threshold is less than 10 tiles stolen by each player.
+
+    stealing few tiles in a game that is all about painting tiles and stealing the enemy's tiles is basically pointless.
+
+4. **hasSuspiciousPlayersGlobal - collusion**
+
+    The hasSuspiciousPlayersGlobal flag detects when all players in a match have played more than 50 matches (default), but it is important to know what “collusion” is.
+
+    This flag is configurable on line 60 of the suspiciousGames.js file
+
+    The term commonly used in competitions to describe the practice of repeatedly playing with the same people to exclude others and secure prizes within a group is “collusion.”
+
+    Collusion in this context refers to a secret agreement or cooperation between participants to manipulate the results of the competition in their favor, unfairly excluding other competitors. It is a practice generally prohibited in competitions, tournaments, and organized games.
+
+    The information in this flag can be verified with the player_counts.json, repeat_offender_players.json, and suspicious_matches.json files.
+
+## GRATITUDE
+
+    Finally, I would like to thank anyone who has seen my code, it is free to use, you can do with it whatever you like, I know that the code may have many improvements, errors, etc... however, it is what I was able to do in a couple of hours, I hope that if someone finds it useful, they can improve it in terms of loading times and perhaps detect more irregularities, everything I do and do not do, has always been and will be to help the beautiful Habbo community, thank you for reading and using my code.
+
+    Sincerely, Emo. - Origins EN
+
+## Instalación y uso
+
+1. **Instalar dependencias:**
+
+    Ejecutar el siguiente comando en la consola para instalar las dependencias necesarias:
+
+    npm install
+
+2. **Configurar variables de entorno:**
+
+    En el archivo .env, inserte el ID de usuario que desea investigar asignándolo a la variable TARGET_PLAYER_ID.
+
+    Ejemplo:
+
+    TARGET_PLAYER_ID=gp-hhoes-a9b08b16186ec8c9be235ada44f5e777
+
+    Este ID es de mi usuario Emo. y realicé algunas prácticas poco éticas para ver si funcionaba el detector de trampas. No estoy participando en la competencia y solo hice este programa para intentar que la competencia sea más justa para todos.
+
+3. **Ejecutar el script:**
+
+    Ejecute el siguiente comando en la consola para iniciar el proceso:
+
+    node .
+
+4. **Tiempo de procesamiento:**
+
+    El proceso puede tardar un tiempo en completarse, dependiendo de la cantidad de juegos que se analicen. Cuantos más juegos haya, más tiempo tardará.
+
+## Explicación del flujo y los archivos JSON generados
+
+    El flujo se realiza en orden de lista.
+
+1. **Ejecución del script**
+
+    El script comienza recuperando todos los juegos de Battleball relacionados con el jugador objetivo. Esto lo administra el script games.js
+
+2. **games.json**
+
+    Este archivo se genera para almacenar todos los juegos en los que ha participado el jugador objetivo. Actúa como referencia para un análisis posterior.
+
+3. **gamesDetails.js**
+
+    Este script se utiliza principalmente para detectar cuántas veces has jugado juegos con los mismos jugadores, también su tasa de victorias, puntaje, juegos totales, juegos casuales totales y juegos clasificados totales.
+
+4. **player_counts.json**
+
+    Este archivo contiene el número total de partidos en los que ha participado el jugador objetivo (bajo investigación), junto con un recuento de cuántas veces se ha encontrado con otros jugadores en esos partidos. (Este recuento no discrimina si los partidos que ha compartido con un jugador son en el mismo equipo o en equipos enemigos).
+
+5. **total_game_score_and_win_rate.json**
+
+    Este archivo contiene información básica, para usuarios menos técnicos.
+
+6. **suspiciousGames.js y la detección de irregularidades**
+
+    El script psychologicalGames.js se utiliza para detectar comportamientos sospechosos en los partidos, como patrones inusuales de similitudes en los puntajes o diferencias significativas en los puntajes que podrían indicar irregularidades.
+
+7. **suspicious_matches.json**
+
+    Este archivo contiene información sobre todos los juegos sospechosos (por defecto, todos los juegos donde el número de participantes es menor o igual a 4 (1vs1, 2vs2, 3vs1) se consideran juegos sospechosos; sin embargo, esto es configurable "ingresando y leyendo la documentación del archivo").
+
+    En este archivo vemos los detalles de cada juego sospechoso, así como sus flags asignados, tanto de forma individual para cada jugador como de forma global para el juego. También hay otra información relevante como el marcador, casillas pintadas, robadas, bloqueadas, etc.
+
+8. **repeat_offender_players.json**
+
+    En este archivo hay información de cuantas veces reincidiste jugando con un jugador, discriminado si compartiste la partida jugando con o contra el jugador (aquí solo aparecen jugadores con los que has compartido 50 partidas SOSPECHOSAS por defecto, si quieres cambiar el número de partidas sospechosas es configurable desde el archivo concernedGames.js línea 64) IMPORTANTE A TENER EN CUENTA PARA TI QUÉ ES UNA PARTIDA SOSPECHOSA "recuerda que por defecto es en 1vs1, 2vs2 y 3vs1"
+
+    La información de este archivo es muy importante porque es la validación entre player_counts.json y concerned_matches.json para detectar la trampa conocida como "collusion"
+
+9. **flag_counts.json**
+
+    Por último, este archivo resume las flags o alertas (como quieras llamarlas ellos) que este jugador tiene en juegos sospechosos "solo hace que la lectura sea más fácil".
+
+## Explicación de las banderas
+
+1. **hasSuspiciousEqualScores - acuerdo sobre juegos**
+
+    La bandera hasSuspiciousEqualScores se activa cuando los puntajes de los jugadores en un juego son muy similares, lo que sugiere que los jugadores podrían haber acordado de antemano terminar el juego con puntajes casi idénticos. El umbral predeterminado para esta bandera es una diferencia de 5 puntos o menos entre los puntajes. Por ejemplo, en un juego 1 contra 1, si un jugador obtiene 90 y el otro 88, esta bandera se establecerá como verdadera. En un partido con cuatro participantes, si sus puntajes son 90, 85, 87 y 89, la bandera también se activará porque las diferencias están dentro del umbral de 5 puntos.
+
+    Este umbral se puede ajustar en el archivo concernedGames.js en la línea 107.
+
+    Explicación de ponerse de acuerdo sobre los juegos:
+    Ponerse de acuerdo sobre los juegos se refiere a una situación en la que los jugadores de una partida acuerdan en secreto lograr puntuaciones similares, asegurándose de que ningún jugador supere significativamente a los demás. Esto se hace a menudo para beneficiar mutuamente a todos los jugadores involucrados, por ejemplo, evitando sospechas o asegurándose de que todos reciban las mismas recompensas o reconocimientos. Este tipo de comportamiento se considera poco ético ya que manipula el resultado del juego, socavando la competencia justa.
+
+2. **hasSuspiciousLargeDifferences - aumento de victorias**
+
+    El indicador hasSuspiciousLargeDifferences se utiliza para detectar situaciones en las que el jugador objetivo (bajo investigación) tiene una puntuación significativamente más alta que todos los demás participantes en una partida, específicamente por más de 50 puntos (por defecto). Esta gran diferencia en las puntuaciones podría indicar que el jugador objetivo recibió ayuda de otros que podrían no haber estado tratando de ganar, sino que estaban jugando de una manera que le permitió al jugador objetivo lograr una puntuación mucho más alta.
+
+    Este umbral se puede ajustar en el archivo sospechosoGames.js en la línea 113.
+
+    Explicación de Win Boosting:
+    Win Boosting es una táctica en la que los jugadores tienen un rendimiento inferior o pierden intencionalmente en un juego para ayudar a otro jugador a ganar o lograr una puntuación más alta. En el contexto de este script, significa que otros jugadores podrían estar haciendo movimientos malos deliberadamente, no disputando objetivos o no tratando de ganar la partida, todo para garantizar que el jugador objetivo se beneficie, generalmente aumentando su puntuación o mejorando su tasa de victorias. Esta práctica a menudo está mal vista porque socava la integridad competitiva del juego.
+
+3. **hasSuspiciousLargeDifferences - aumento de victorias/agresión en partidas**
+
+    allTilesStolenLowGlobal Esta bandera básicamente sirve como un puente (si lo deseas) para ayudar a detectar comportamiento sospechoso de todos los jugadores en el juego, básicamente detecta si hubo pocas fichas robadas por TODOS los jugadores en el juego. El umbral es menos de 10 fichas robadas por cada jugador.
+
+    robar pocas fichas en un juego que se trata de pintar fichas y robar las fichas del enemigo es básicamente inútil.
+
+4. **hasSuspiciousPlayersGlobal - colusión**
+
+    La bandera hasSuspiciousPlayersGlobal detecta cuando todos los jugadores en una partida han jugado más de 50 partidas (predeterminado), pero es importante saber qué es la "colusión".
+
+    Esta bandera se puede configurar en la línea 60 del archivo concernedGames.js
+
+    El término que se usa comúnmente en las competiciones para describir la práctica de jugar repetidamente con las mismas personas para excluir a otros y asegurarse premios dentro de un grupo es “colusión”.
+
+    La colusión en este contexto se refiere a un acuerdo secreto o cooperación entre los participantes para manipular los resultados de la competición a su favor, excluyendo injustamente a otros competidores. Es una práctica generalmente prohibida en competiciones, torneos y juegos organizados.
+
+    La información de esta bandera se puede verificar con los archivos player_counts.json, repeat_offender_players.json y concerned_matches.json.
+
+## Agradecimiento 
+
+    Por ultimo de gustaria agradecer a cualquier que halla visto mi codigo, es de uso libre, pueden hacer con el lo que gusten, se que talvez el codigo puede tener muchas mejoras, fallas, etc... sin embargo es lo que pude hacer en un par de horas, espero que si alguien lo ve util lo pueda perfeccionar en los tiempos de carga y talvez detectando mas irregularidades, todo lo que hago y dejo de hacer, siempre a sido y sera por ayudar a la hermosa comunidad de habbo, gracias por leer y utilizar mi codigo.
+
+    atentamente Emo. - Origins ES

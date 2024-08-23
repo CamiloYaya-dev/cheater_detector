@@ -1,11 +1,11 @@
 const axios = require('axios');
 const fs = require('fs');
-require('dotenv').config(); // Cargar variables de entorno desde .env
+require('dotenv').config();
 
 const apiUrlMatchDetails = 'https://origins.habbo.es/api/public/matches/v1';
 let playerCounts = {};
 let matches = [];
-const targetPlayerId = process.env.TARGET_PLAYER_ID; // Jugador objetivo
+const targetPlayerId = process.env.TARGET_PLAYER_ID;
 
 async function loadFiles() {
     try {
@@ -23,7 +23,7 @@ async function loadFiles() {
 
     } catch (error) {
         console.error('Error reading or parsing input files:', error.message);
-        return false;  // Abort further execution if any file cannot be read or parsed
+        return false; 
     }
 
     return true;
@@ -40,24 +40,23 @@ async function analyzeMatches() {
             const matchInfo = response.data.info;
             const participants = response.data.metadata.participantPlayerIds;
 
-            // Si la partida es ranked y tiene menos de 4 jugadores (1 vs 1 o 2 vs 2)
             if (matchInfo.ranked && participants.length <= 4) {
-                let allPlayersSuspicious = true; // Global flag for the match
+                let allPlayersSuspicious = true;
+                let allTilesStolenLowGlobal = true;
                 let suspiciousPlayerData = [];
                 let scores = [];
-                let allTilesStolenLowGlobal = true;  // Global flag for the match
                 let targetPlayerScore = 0;
                 let enemyTeamScores = [];
 
                 for (const player of matchInfo.participants) {
                     let isSuspiciousPlayer = false;
+
                     if (player.gamePlayerId === targetPlayerId) {
-                        isSuspiciousPlayer = true; // Marcar al jugador objetivo como sospechoso
+                        isSuspiciousPlayer = true;
                         targetPlayerScore = player.gameScore;
                     } else {
                         enemyTeamScores.push(player.gameScore);
 
-                        // Marcar a los otros jugadores como sospechosos si han jugado más de 50 partidas
                         if (playerCounts[player.gamePlayerId] && playerCounts[player.gamePlayerId] >= 50) {
                             isSuspiciousPlayer = true;
                         }
@@ -78,33 +77,28 @@ async function analyzeMatches() {
                         tilesLocked: player.tilesLocked,
                         tilesColouredForOpponents: player.tilesColouredForOpponents,
                         tilesStolenLow: player.tilesStolen < 10, // Flag for individual player
-                        isSuspiciousPlayer: isSuspiciousPlayer // Garantizar que el jugador objetivo siempre sea sospechoso
+                        isSuspiciousPlayer: isSuspiciousPlayer
                     };
+                   
+                    if (!playerData.tilesStolenLow) {
+                        allTilesStolenLowGlobal = false; 
+                    }
 
                     suspiciousPlayerData.push(playerData);
                     scores.push(player.gameScore);
 
-                    // Verificar si este jugador ha robado pocas fichas
-                    if (player.tilesStolen >= 5) {
-                        allTilesStolenLowGlobal = false;
-                    }
-
-                    // Si algún jugador no es sospechoso y no es el jugador objetivo, se desactiva la bandera global
                     if (!isSuspiciousPlayer) {
                         allPlayersSuspicious = false;
                     }
                 }
 
-                // Ordenar puntuaciones para comparar valores adyacentes
                 scores.sort((a, b) => a - b);
 
-                // Verificar puntuaciones casi iguales
                 let hasSuspiciousEqualScores = scores.every((score, index, arr) => {
                     if (index === 0) return true;
-                    return Math.abs(score - arr[index - 1]) <= 5; // Ajustar el umbral según sea necesario
+                    return Math.abs(score - arr[index - 1]) <= 5;
                 });
 
-                // Verificar grandes diferencias en puntuaciones donde el jugador objetivo se beneficia
                 let hasSuspiciousLargeDifferences = false;
                 if (enemyTeamScores.length > 0) {
                     hasSuspiciousLargeDifferences = enemyTeamScores.every(score => Math.abs(targetPlayerScore - score) > 50);

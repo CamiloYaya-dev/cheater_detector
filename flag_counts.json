@@ -1,6 +1,6 @@
 {
-  "hasSuspiciousEqualScores": 3,
-  "hasSuspiciousLargeDifferences": 40,
-  "allTilesStolenLowGlobal": 0,
-  "hasSuspiciousPlayersGlobal": 346
+  "hasSuspiciousEqualScores": 12,
+  "hasSuspiciousLargeDifferences": 21,
+  "allTilesStolenLowGlobal": 27,
+  "hasSuspiciousPlayersGlobal": 11
 }

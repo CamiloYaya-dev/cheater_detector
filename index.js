@@ -1,6 +1,6 @@
 async function runScripts() {
-    //await require('./games.js')();
-    //await require('./gamesDetails.js')();
+    await require('./games.js')();
+    await require('./gamesDetails.js')();
     await require('./suspiciousGames.js')();
 }
 

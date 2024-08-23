@@ -1,128 +1,14 @@
 [
   {
-    "gamePlayerId": "gp-hhoes-fcfb0d715f13a3b7c748919bb105c492",
-    "appearances": 5,
-    "gamesWith": 0,
-    "gamesAgainst": 5
-  },
-  {
-    "gamePlayerId": "gp-hhoes-aa740b1416e535a7609309444926e28b",
-    "appearances": 85,
-    "gamesWith": 63,
-    "gamesAgainst": 22
-  },
-  {
-    "gamePlayerId": "gp-hhoes-c249e750401e525d80ca74c390b6a343",
-    "appearances": 371,
-    "gamesWith": 371,
+    "gamePlayerId": "gp-hhoes-a9b08b16186ec8c9be235ada44f5e777",
+    "appearances": 40,
+    "gamesWith": 40,
     "gamesAgainst": 0
   },
   {
-    "gamePlayerId": "gp-hhoes-2fb1187460854e72544cc098dce7c506",
-    "appearances": 10,
-    "gamesWith": 6,
-    "gamesAgainst": 4
-  },
-  {
-    "gamePlayerId": "gp-hhoes-4e9584d0cf28101e3b43992909e49d1f",
-    "appearances": 71,
-    "gamesWith": 21,
-    "gamesAgainst": 50
-  },
-  {
-    "gamePlayerId": "gp-hhoes-99204c1cfe4937203154e3580d1fef83",
-    "appearances": 72,
-    "gamesWith": 22,
-    "gamesAgainst": 50
-  },
-  {
-    "gamePlayerId": "gp-hhoes-e44c4b6613bed4baabafb6d91dffe90a",
-    "appearances": 109,
-    "gamesWith": 11,
-    "gamesAgainst": 98
-  },
-  {
-    "gamePlayerId": "gp-hhoes-9c6fd650363e8ac63bd2dfd471f67965",
-    "appearances": 95,
-    "gamesWith": 28,
-    "gamesAgainst": 67
-  },
-  {
-    "gamePlayerId": "gp-hhoes-6556e52d49ab9d4791159527d1a98c4b",
-    "appearances": 49,
-    "gamesWith": 10,
-    "gamesAgainst": 39
-  },
-  {
-    "gamePlayerId": "gp-hhoes-0fe47c6526da66e1a4c3a0757118e56e",
-    "appearances": 174,
-    "gamesWith": 86,
-    "gamesAgainst": 88
-  },
-  {
-    "gamePlayerId": "gp-hhoes-b374d95b01034013391db1abd999a945",
-    "appearances": 28,
-    "gamesWith": 7,
-    "gamesAgainst": 21
-  },
-  {
-    "gamePlayerId": "gp-hhoes-564c7cc08722390f6ff1d8951bffcdcb",
-    "appearances": 19,
-    "gamesWith": 5,
-    "gamesAgainst": 14
-  },
-  {
-    "gamePlayerId": "gp-hhoes-95a7a54f3c1284045280bd6b9eccce1f",
-    "appearances": 11,
+    "gamePlayerId": "gp-hhoes-3b3b4547a903dc6fff167501bf9fa08e",
+    "appearances": 13,
     "gamesWith": 1,
-    "gamesAgainst": 10
-  },
-  {
-    "gamePlayerId": "gp-hhoes-d4db70bd30b1e12470a2f86ce72ce90b",
-    "appearances": 16,
-    "gamesWith": 5,
-    "gamesAgainst": 11
-  },
-  {
-    "gamePlayerId": "gp-hhoes-6c080909564635603248d46167632e91",
-    "appearances": 35,
-    "gamesWith": 4,
-    "gamesAgainst": 31
-  },
-  {
-    "gamePlayerId": "gp-hhoes-a547075d97c39b62c746311e49af2c15",
-    "appearances": 106,
-    "gamesWith": 20,
-    "gamesAgainst": 86
-  },
-  {
-    "gamePlayerId": "gp-hhoes-df05c5a6c3220fe8bd9e9a561e134bc6",
-    "appearances": 21,
-    "gamesWith": 8,
-    "gamesAgainst": 13
-  },
-  {
-    "gamePlayerId": "gp-hhoes-fcf8c530900a90ddc1636e1dea2d998c",
-    "appearances": 15,
-    "gamesWith": 3,
     "gamesAgainst": 12
-  },
-  {
-    "gamePlayerId": "gp-hhoes-c37afabce75ba7d9024710810e909412",
-    "appearances": 45,
-    "gamesWith": 13,
-    "gamesAgainst": 32
-  },
-  {
-    "gamePlayerId": "gp-hhoes-3c6feb7d9605a04728b43a946a1359e3",
-    "appearances": 41,
-    "gamesWith": 7,
-    "gamesAgainst": 34
-  },
-  {
-    "gamePlayerId": "gp-hhoes-74d4a8f5a37019aa18d4f57c8d9ee7b5",
-    "appearances": 31,
-    "gamesWith": 15,
-    "gamesAgainst": 16
   }
 ]
