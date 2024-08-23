@@ -6,7 +6,9 @@ let playerCounts = {};
 let totalGameScore = 0;
 let winCount = 0;
 let totalRankedMatches = 0;
-const targetPlayerId = 'gp-hhoes-931112b96c7a9bd3afa5c1f5ed0276a5';
+let totalMatches = 0;  // Total de partidas
+let totalNonRankedMatches = 0;  // Partidas con ranked: false
+const targetPlayerId = process.env.TARGET_PLAYER_ID;
 
 async function fetchMatchDetails() {
     let matches;
@@ -35,16 +37,20 @@ async function fetchMatchDetails() {
             const matchInfo = response.data.info;
             const participants = response.data.metadata.participantPlayerIds;
 
-            // Solo procesar si la partida es ranked
+            // Incrementar el total de partidas
+            totalMatches++;
+
             if (matchInfo.ranked) {
                 totalRankedMatches++;
 
-                // Contar la aparición de cada participante
+                // Contar la aparición de cada participante, excluyendo al jugador objetivo
                 for (const playerId of participants) {
-                    if (playerCounts[playerId]) {
-                        playerCounts[playerId] += 1;
-                    } else {
-                        playerCounts[playerId] = 1;
+                    if (playerId !== targetPlayerId) {
+                        if (playerCounts[playerId]) {
+                            playerCounts[playerId] += 1;
+                        } else {
+                            playerCounts[playerId] = 1;
+                        }
                     }
                 }
 
@@ -60,8 +66,11 @@ async function fetchMatchDetails() {
                     }
                 }
 
-                console.log(`Processed ranked match: ${matchId}`);
+            } else {
+                totalNonRankedMatches++;  // Incrementar el contador de partidas no rankeadas
             }
+
+            console.log(`Processed match: ${matchId}`);
 
         } catch (error) {
             console.error(`Error fetching match details for match ID ${matchId}:`, error);
@@ -90,7 +99,10 @@ async function saveTotalGameScoreAndWinRateToFile() {
     const winRate = (winCount / totalRankedMatches) * 100;
     const result = {
         totalGameScore,
-        winRate: `${winRate.toFixed(2)}%`
+        winRate: `${winRate.toFixed(2)}%`,
+        totalMatches,  // Total de partidas jugadas
+        totalRankedMatches,  // Partidas con ranked: true
+        totalNonRankedMatches  // Partidas con ranked: false
     };
 
     return new Promise((resolve, reject) => {

@@ -1,7 +1,8 @@
 const axios = require('axios');
 const fs = require('fs');
+require('dotenv').config(); // Cargar variables de entorno desde .env
 
-const apiUrl = 'https://origins.habbo.es/api/public/matches/v1/gp-hhoes-931112b96c7a9bd3afa5c1f5ed0276a5/ids';
+const apiUrl = `https://origins.habbo.es/api/public/matches/v1/${process.env.TARGET_PLAYER_ID}/ids`;
 const limit = 100; // Límite máximo por la API
 let offset = 0;
 let allResults = [];

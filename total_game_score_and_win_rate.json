@@ -1,4 +1,7 @@
 {
-  "totalGameScore": 45562,
-  "winRate": "49.53%"
+  "totalGameScore": 80591,
+  "winRate": "52.23%",
+  "totalMatches": 1035,
+  "totalRankedMatches": 1007,
+  "totalNonRankedMatches": 28
 }

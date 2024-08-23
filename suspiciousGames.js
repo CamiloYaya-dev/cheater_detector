@@ -4,6 +4,7 @@ const fs = require('fs');
 const apiUrlMatchDetails = 'https://origins.habbo.es/api/public/matches/v1';
 let playerCounts = {};
 let matches = [];
+const targetPlayerId = process.env.TARGET_PLAYER_ID; // Jugador objetivo
 
 async function loadFiles() {
     try {
@@ -39,29 +40,51 @@ async function analyzeMatches() {
             const matchInfo = response.data.info;
             const participants = response.data.metadata.participantPlayerIds;
 
-            // If the game is ranked and has less than 4 players (1 vs 1 or 2 vs 2)
+            // Si la partida es ranked y tiene menos de 4 jugadores (1 vs 1 o 2 vs 2)
             if (matchInfo.ranked && participants.length <= 4) {
-                let hasSuspiciousPlayersGlobal = false; // Global flag for the match
+                let allPlayersSuspicious = true; // Global flag for the match
                 let suspiciousPlayerData = [];
                 let scores = [];
                 let allTilesStolenLowGlobal = true;  // Global flag for the match
+                let targetPlayerScore = 0;
+                let enemyTeamScores = [];
 
-                // Gather all player scores and check tilesStolen
+                // Determine the team of the target player
+                const targetPlayerTeam = matchInfo.participants.find(p => p.gamePlayerId === targetPlayerId)?.teamId;
+
                 for (const player of matchInfo.participants) {
                     let isSuspiciousPlayer = false;
 
-                    // Check if the player has appeared in many games (repeat offender)
-                    if (playerCounts[player.gamePlayerId] && playerCounts[player.gamePlayerId] >= 50) { // Adjust the threshold as needed
+                    // Mark the player as suspicious if they are not the target player and have participated in 50+ matches
+                    if (playerCounts[player.gamePlayerId] && playerCounts[player.gamePlayerId] >= 50) {
                         isSuspiciousPlayer = true;
-                        hasSuspiciousPlayersGlobal = true; // Mark the match as having suspicious players
 
                         // Add player to repeat offender list if not already present
-                        if (!repeatOffenderPlayers.some(p => p.gamePlayerId === player.gamePlayerId)) {
+                        let existingPlayer = repeatOffenderPlayers.find(p => p.gamePlayerId === player.gamePlayerId);
+                        if (!existingPlayer) {
                             repeatOffenderPlayers.push({
                                 gamePlayerId: player.gamePlayerId,
-                                appearances: playerCounts[player.gamePlayerId]
+                                appearances: playerCounts[player.gamePlayerId],
+                                gamesWith: 0, // Initialize count of games played with the target player
+                                gamesAgainst: 0, // Initialize count of games played against the target player
+                                gamesWon: 0, // Initialize games won
+                                gamesLost: 0  // Initialize games lost
                             });
+                            existingPlayer = repeatOffenderPlayers[repeatOffenderPlayers.length - 1];
                         }
+
+                        // Increment gamesWith or gamesAgainst based on team association
+                        if (player.teamId === targetPlayerTeam) {
+                            existingPlayer.gamesWith++;
+                        } else {
+                            existingPlayer.gamesAgainst++;
+                        }
+                    }
+
+                    if (player.gamePlayerId === targetPlayerId) {
+                        targetPlayerScore = player.gameScore;
+                    } else {
+                        enemyTeamScores.push(player.gameScore);
                     }
 
                     const playerData = {
@@ -88,6 +111,11 @@ async function analyzeMatches() {
                     if (player.tilesStolen >= 5) {
                         allTilesStolenLowGlobal = false;
                     }
+
+                    // If any non-target player is not suspicious, set allPlayersSuspicious to false
+                    if (!isSuspiciousPlayer && player.gamePlayerId !== targetPlayerId) {
+                        allPlayersSuspicious = false;
+                    }
                 }
 
                 // Sort scores to easily compare adjacent values
@@ -99,13 +127,13 @@ async function analyzeMatches() {
                     return Math.abs(score - arr[index - 1]) <= 5; // Adjust threshold as needed
                 });
 
-                // Check for large differences in scores
-                let hasSuspiciousLargeDifferences = scores.some((score, index, arr) => {
-                    if (index === 0) return false;
-                    return Math.abs(score - arr[index - 1]) > 50; // Adjust threshold as needed
-                });
+                // Check for large differences in scores where the target player benefits
+                let hasSuspiciousLargeDifferences = false;
+                if (enemyTeamScores.length > 0) {
+                    hasSuspiciousLargeDifferences = enemyTeamScores.every(score => Math.abs(targetPlayerScore - score) > 50);
+                }
 
-                if (hasSuspiciousPlayersGlobal || hasSuspiciousEqualScores || hasSuspiciousLargeDifferences || allTilesStolenLowGlobal) {
+                if (hasSuspiciousEqualScores || hasSuspiciousLargeDifferences || allTilesStolenLowGlobal || allPlayersSuspicious) {
                     suspiciousMatches.push({
                         matchId,
                         participants,
@@ -117,8 +145,8 @@ async function analyzeMatches() {
                         players: suspiciousPlayerData,
                         hasSuspiciousEqualScores,
                         hasSuspiciousLargeDifferences,
-                        allTilesStolenLowGlobal, // Global flag indicating if all players stole fewer than 5 tiles
-                        hasSuspiciousPlayersGlobal // Global flag indicating if there are any suspicious players based on repetitions
+                        allTilesStolenLowGlobal,
+                        hasSuspiciousPlayersGlobal: allPlayersSuspicious
                     });
                     console.log(`Suspicious match found: ${matchId}`);
                 }
@@ -130,6 +158,7 @@ async function analyzeMatches() {
 
     saveSuspiciousMatchesToFile(suspiciousMatches);
     saveRepeatOffenderPlayersToFile(repeatOffenderPlayers);
+    await calculateAndSaveFlagCounts(suspiciousMatches);
 }
 
 function saveSuspiciousMatchesToFile(suspiciousMatches) {
@@ -148,6 +177,30 @@ function saveRepeatOffenderPlayersToFile(repeatOffenderPlayers) {
             console.error('Error writing to file:', err);
         } else {
             console.log('Repeat offender players successfully saved to repeat_offender_players.json');
+        }
+    });
+}
+
+async function calculateAndSaveFlagCounts(suspiciousMatches) {
+    const flagCounts = {
+        hasSuspiciousEqualScores: 0,
+        hasSuspiciousLargeDifferences: 0,
+        allTilesStolenLowGlobal: 0,
+        hasSuspiciousPlayersGlobal: 0
+    };
+
+    for (const match of suspiciousMatches) {
+        if (match.hasSuspiciousEqualScores) flagCounts.hasSuspiciousEqualScores++;
+        if (match.hasSuspiciousLargeDifferences) flagCounts.hasSuspiciousLargeDifferences++;
+        if (match.allTilesStolenLowGlobal) flagCounts.allTilesStolenLowGlobal++;
+        if (match.hasSuspiciousPlayersGlobal) flagCounts.hasSuspiciousPlayersGlobal++;
+    }
+
+    fs.writeFile('flag_counts.json', JSON.stringify(flagCounts, null, 2), (err) => {
+        if (err) {
+            console.error('Error writing to flag_counts.json:', err);
+        } else {
+            console.log('Flag counts successfully saved to flag_counts.json');
         }
     });
 }
