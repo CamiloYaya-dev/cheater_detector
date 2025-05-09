@@ -40,7 +40,7 @@ async function analyzeMatches() {
             const matchInfo = response.data.info;
             const participants = response.data.metadata.participantPlayerIds;
 
-            if (matchInfo.ranked && participants.length <= 4) {
+            if (matchInfo.ranked && participants.length <= 2) {
                 let allPlayersSuspicious = true;
                 let allTilesStolenLowGlobal = true;
                 let suspiciousPlayerData = [];
